@@ -62,52 +62,28 @@ public class PlayerController : MonoBehaviour
 
     public void Movement()
     {
-        Vector3 forwardDir = transform.forward;
-        forwardDir.y = 0;
-        forwardDir.Normalize();
-
-        if (moveInput != Vector2.zero)
-        {
-            Quaternion targetQuaternion = Quaternion.LookRotation(forwardDir, Vector3.up);
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetQuaternion, rotationSpeed * Time.deltaTime);
-        }
-
-
-        transform.Rotate(Vector3.up * moveInput.x * rotationSpeed * Time.deltaTime);
+      
         float currentSpeed = isSprinting ? baseMoveSpeed * 3 : baseMoveSpeed;
-        Vector3 moveDir = forwardDir * currentSpeed * moveInput.y;
 
-
-
-
-
+        Vector3 moveDir = (transform.forward * moveInput.y + transform.right * moveInput.x) * currentSpeed;
 
         verticalVelocity += Physics.gravity.y * Time.deltaTime;
 
         if (controller.isGrounded && verticalVelocity < 0)
-
             verticalVelocity = -2f;
-
-
 
         moveDir.y = verticalVelocity;
 
-
         if (IsDashing)
         {
-            moveDir = transform.forward * dashForce * (dashTimer / dashTimer);
-            IsDashing = false;
+            // dash in the forward direction without changing rotation
+            moveDir = transform.forward * dashForce;
             dashTimer -= Time.deltaTime;
             if (dashTimer <= 0)
                 IsDashing = false;
-
         }
 
-
         controller.Move(moveDir * Time.deltaTime);
-
 
     }
     /* 
